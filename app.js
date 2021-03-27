@@ -32,7 +32,6 @@ app.use(methodOverride('_method'));
 
 // Joi middleware //
 const validateCampground = (req, res, next) => {
-   
    // validate campground data with Joi schema //
    const { error } = campgroundSchema.validate(req.body);
       if(error){
@@ -77,9 +76,9 @@ app.post('/campgrounds', validateCampground, catchAsync(async(req, res, next) =>
    res.redirect(`/campgrounds/${campground._id}`);
 }))
 
-// route to get details about a specific campground //
+// route to get to show/details page for a specific campground //
 app.get('/campgrounds/:id', catchAsync(async (req, res) => {
-   const campground = await Campground.findById(req.params.id);
+   const campground = await Campground.findById(req.params.id).populate('reviews');
    res.render('campgrounds/show', { campground });
 }))
 
@@ -104,6 +103,7 @@ app.delete('/campgrounds/:id', catchAsync(async (req, res) => {
    res.redirect('/campgrounds');
 }));
 
+// validateReview is Joi middleware //
 app.post('/campgrounds/:id/reviews', validateReview, catchAsync(async (req, res) => {
    const campground = await Campground.findById(req.params.id);
    const review = new Review(req.body.review);
@@ -128,7 +128,6 @@ app.use((err, req, res, next) => {
    // statusCode and message are now available for use //
    res.status(statusCode).render('error', { err });
 })
-
 
 app.listen(3000, () => {
    console.log("Listening on port 3000");
