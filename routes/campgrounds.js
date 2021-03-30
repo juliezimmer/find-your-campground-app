@@ -32,9 +32,9 @@ router.get('/new', (req, res) => {
 
 // endpoint where new campground form is submitted //
 router.post('/', validateCampground, catchAsync(async(req, res, next) => {
-   // if(! req.body.campgrounds) throw new ExpressError('Invalid Campground Data', 400);
    const campground = new Campground(req.body.campground);
    await campground.save();
+   req.flash('success', 'Successfully made a new campground');
    // redirects to detail page //
    res.redirect(`/campgrounds/${campground._id}`);
 }))
@@ -42,7 +42,7 @@ router.post('/', validateCampground, catchAsync(async(req, res, next) => {
 // route to get to show/details page for a specific campground //
 router.get('/:id', catchAsync(async (req, res) => {
    const campground = await Campground.findById(req.params.id).populate('reviews');
-   res.render('campgrounds/show', { campground });
+   res.render('campgrounds/show', { campground  });
 }))
 
 // route that serves edit form that will look up campground by id //
