@@ -2,16 +2,16 @@ const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
 const ejsMate = require('ejs-mate');
-const { campgroundSchema, reviewSchema } = require('./schemas.js');
-const catchAsync = require('./utilities/catchAsync');
 const ExpressError = require('./utilities/ExpressError');
 const methodOverride = require('method-override');
-const Campground = require('./models/campground');
-const Review = require('./models/review');
+
+const campgrounds = require('./routes/campgrounds'); 
+const reviews = require('./routes/reviews')
 
 mongoose.connect('mongodb://localhost:27017/yelp-camp', {       useNewUrlParser: true, 
    useCreateIndex: true,
-   useUnifiedTopology: true
+   useUnifiedTopology: true,
+   useFindAndModify: false
 });
 
 const db = mongoose.connection;
@@ -29,97 +29,12 @@ app.set('views', path.join(__dirname, 'views'));
 
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Joi middleware //
-const validateCampground = (req, res, next) => {
-   // validate campground data with Joi schema //
-   const { error } = campgroundSchema.validate(req.body);
-      if(error){
-         const msg = error.details.map(el => el.message).join(',')
-         throw new ExpressError(msg, 400) // should be caught and passed down to app.use //
-      } else {
-         next();
-      }
-}
+// everything starts with campgrounds; use the campgrounds rouotes as indicated above //
+app.use('/campgrounds', campgrounds);
+app.use('/campgrounds/:id/reviews', reviews);
 
-// middleware for validation //
-const validateReview = (req, res, next) => {
-   const {error} = reviewSchema.validate(req.body);
-   if(error){
-      const msg = error.details.map(el => el.message).join(',')
-      throw new ExpressError(msg, 400) // should be caught and passed down to app.use //
-   } else {
-      next();
-   }
-}
-
-app.get('/', (req, res) => {
-   res.render('home');
-})
-
-app.get('/campgrounds', catchAsync(async (req, res) => {
-   const campgrounds = await Campground.find({});
-   res.render('campgrounds/index', { campgrounds });
-}))
-
-// route to serve new campgrounds form //
-app.get('/campgrounds/new', (req, res) => {
-   res.render('campgrounds/new');
-})
-
-// endpoint where new campground form is submitted //
-app.post('/campgrounds', validateCampground, catchAsync(async(req, res, next) => {
-   // if(! req.body.campgrounds) throw new ExpressError('Invalid Campground Data', 400);
-   const campground = new Campground(req.body.campground);
-   await campground.save();
-   // redirects to detail page //
-   res.redirect(`/campgrounds/${campground._id}`);
-}))
-
-// route to get to show/details page for a specific campground //
-app.get('/campgrounds/:id', catchAsync(async (req, res) => {
-   const campground = await Campground.findById(req.params.id).populate('reviews');
-   res.render('campgrounds/show', { campground });
-}))
-
-// route that serves edit form that will look up campground by id //
-app.get('/campgrounds/:id/edit', catchAsync(async (req, res) => {
-   const campground = await Campground.findById(req.params.id);
-   res.render('campgrounds/edit', { campground });
-}))
-
-// route to serve edit form //
-app.put('/campgrounds/:id', validateCampground, catchAsync(async(req, res) => {
-   const { id } = req.params;
-   const campground = await Campground.findByIdAndUpdate(id, { ...req.body.campground});
-   // redirects to details page of updated campground //
-   res.redirect(`/campgrounds/${campground._id}`);
-}));
-
-// route to delete a campground //
-app.delete('/campgrounds/:id', catchAsync(async (req, res) => {
-   const { id } = req.params;
-   await Campground.findByIdAndDelete(id);
-   res.redirect('/campgrounds');
-}));
-
-// validateReview is Joi middleware //
-app.post('/campgrounds/:id/reviews', validateReview, catchAsync(async (req, res) => {
-   const campground = await Campground.findById(req.params.id);
-   const review = new Review(req.body.review);
-   campground.reviews.push(review);
-   await review.save();
-   await campground.save();
-   res.redirect(`/campgrounds/${campground._id}`);
-}))
-
-// route to delete a review //
-app.delete('/campgrounds/:id/reviews/:reviewId', catchAsync(async(req,res) => {
-   const {id, reviewId } = req.params;
-   await Campground.findByIdAndUpdate(id, { $pull:{ reviews: reviewId }});
-   await Review.findByIdAndDelete(reviewId);
-   res.redirect(`/campgrounds/${id}`);
-}))
 
 // Uses Error Class //
 // covers all paths //
