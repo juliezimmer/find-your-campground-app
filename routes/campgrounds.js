@@ -34,7 +34,7 @@ router.get('/new', (req, res) => {
 router.post('/', validateCampground, catchAsync(async(req, res, next) => {
    const campground = new Campground(req.body.campground);
    await campground.save();
-   req.flash('success', 'Successfully made a new campground');
+   req.flash('success', 'You successfully added a new campground');
    // redirects to detail page //
    res.redirect(`/campgrounds/${campground._id}`);
 }))
@@ -42,12 +42,20 @@ router.post('/', validateCampground, catchAsync(async(req, res, next) => {
 // route to get to show/details page for a specific campground //
 router.get('/:id', catchAsync(async (req, res) => {
    const campground = await Campground.findById(req.params.id).populate('reviews');
+   if(!campground){
+      req.flash('error', 'That campground cannot be found');
+      return res.redirect('/campgrounds');
+   }
    res.render('campgrounds/show', { campground  });
 }))
 
 // route that serves edit form that will look up campground by id //
 router.get('/:id/edit', catchAsync(async (req, res) => {
    const campground = await Campground.findById(req.params.id);
+   if(!campground){
+      req.flash('error', 'That campground cannot be found');
+      return res.redirect('/campgrounds');
+   }
    res.render('campgrounds/edit', { campground });
 }))
 
@@ -55,14 +63,16 @@ router.get('/:id/edit', catchAsync(async (req, res) => {
 router.put('/:id', validateCampground, catchAsync(async(req, res) => {
    const { id } = req.params;
    const campground = await Campground.findByIdAndUpdate(id, { ...req.body.campground});
+   req.flash('success', 'You successfully updated this campground')
    // redirects to details page of updated campground //
    res.redirect(`/campgrounds/${campground._id}`);
 }));
 
 // route to delete a campground //
-app.delete('/:id', catchAsync(async (req, res) => {
+router.delete('/:id', catchAsync(async (req, res) => {
    const { id } = req.params;
    await Campground.findByIdAndDelete(id);
+   req.flash('success', 'You successfully deleted a campground');
    res.redirect('/campgrounds');
 }));
 
