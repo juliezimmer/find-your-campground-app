@@ -6,9 +6,13 @@ const session = require('express-session');
 const flash = require('connect-flash');
 const ExpressError = require('./utilities/ExpressError');
 const methodOverride = require('method-override');
+const passport = require('passport');
+const LocalStrategy = require('passport-local');
+const User = require('./models/user');
 
-const campgrounds = require('./routes/campgrounds'); 
-const reviews = require('./routes/reviews')
+const userRoutes = require('./routes/users');
+const campgroundRoutes = require('./routes/campgrounds'); 
+const reviewRoutes = require('./routes/reviews');
 
 mongoose.connect('mongodb://localhost:27017/yelp-camp', {       
    useNewUrlParser: true, 
@@ -46,6 +50,15 @@ const sessionConfig = {
 app.use(session(sessionConfig));
 app.use(flash());
 
+// initialize and use passport //
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+
 // flash middleware //
 app.use((req, res, next) => {
    res.locals.success = req.flash('success');
@@ -53,11 +66,22 @@ app.use((req, res, next) => {
    next();
 })
 
- 
+app.get('/fakeUser', async (req, res) => {
+// make a new instance of User model //
+   const user = new User ({
+      email: 'nu@gmail.com',
+      username: 'nu'
+   });
+   // Using a method from passport local Mongoose //
+   // need to pass in the user object created above //
+   const newUser = await User.register(user, 'nu');
+   res.send(newUser);
+}) 
 
 // everything starts with campgrounds; use the campgrounds rouotes as indicated above //
-app.use('/campgrounds', campgrounds);
-app.use('/campgrounds/:id/reviews', reviews);
+app.use('/', userRoutes);
+app.use('/campgrounds', campgroundRoutes);
+app.use('/campgrounds/:id/reviews', reviewRoutes);
 
 
 // Uses Error Class //
