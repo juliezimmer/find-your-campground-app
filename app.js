@@ -10,7 +10,8 @@ const methodOverride = require('method-override');
 const campgrounds = require('./routes/campgrounds'); 
 const reviews = require('./routes/reviews')
 
-mongoose.connect('mongodb://localhost:27017/yelp-camp', {       useNewUrlParser: true, 
+mongoose.connect('mongodb://localhost:27017/yelp-camp', {       
+   useNewUrlParser: true, 
    useCreateIndex: true,
    useUnifiedTopology: true,
    useFindAndModify: false
