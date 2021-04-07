@@ -5,4 +5,4 @@
         func (req, res, next).catch(next);
     }
  }
- // this will be used to wrap the async functions  in app.js //
+ // this will be used to wrap the async functions  
