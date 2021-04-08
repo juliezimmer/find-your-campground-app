@@ -11,13 +11,21 @@ router.get('/register', (req, res) => {
 });
 
 // This is just registering a user //
-router.post('/register', catchAsync(async(req, res) => {
+router.post('/register', catchAsync(async(req, res, next) => {
    try {
       const { email, username, password } = req.body;
       const user = new User({ email, username});
+      // user is created and registered //
       const registeredUser = await User.register(user, password);
-      req.flash("success", "Welcome to CampFinder!");
-      res.redirect('/campgrounds');
+      // logging in new user via passport function //
+      req.login(registeredUser, err => {
+         if(err) {
+           return next(err); 
+         } else {
+            req.flash("success", "Welcome to CampFinder!");
+            res.redirect('/campgrounds');
+         }
+      })
    } catch (e){ // e = error or err //
       req.flash('error', e.message);
       res.redirect('register');
