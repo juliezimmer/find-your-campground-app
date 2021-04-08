@@ -40,7 +40,9 @@ router.get('/login', (req, res) => {
 // actually logs in the user and checks credentials //
 router.post('/login', passport.authenticate('local', {failureFlash: true, failureRedirect: '/login'}), (req, res) => {
    req.flash('success', 'Welcome Back!');
-   res.redirect('/campgrounds');
+   const redirectUrl = req.session.returnTo || '/campgrounds';
+   delete req.session.returnTo;
+   res.redirect(redirectUrl);
 })
 
 // logs out the user //
