@@ -1,4 +1,4 @@
-// for using Joi //
+// for using Joi middleware //
 const Joi = require('joi');
 const { number } = require('joi');
 
