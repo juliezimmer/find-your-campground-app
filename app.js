@@ -37,6 +37,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
+
 const sessionConfig = {
    secret: 'thisshouldbeabettersecret!',
    resave: false,
@@ -47,6 +48,7 @@ const sessionConfig = {
       maxAge: 1000 * 60 * 60 * 24 * 7
    }
 }
+
 app.use(session(sessionConfig));
 app.use(flash());
 
@@ -58,7 +60,6 @@ passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-
 // flash middleware; access in all templates //
 app.use((req, res, next) => {
    console.log(req.session);
@@ -68,23 +69,14 @@ app.use((req, res, next) => {
    next();
 })
 
-app.get('/fakeUser', async (req, res) => {
-// make a new instance of User model //
-   const user = new User ({
-      email: 'nu@gmail.com',
-      username: 'nu'
-   });
-   // Using a method from passport local Mongoose //
-   // need to pass in the user object created above //
-   const newUser = await User.register(user, 'nu');
-   res.send(newUser);
-}) 
-
 // everything starts with campgrounds; use the campgrounds rouotes as indicated above //
 app.use('/', userRoutes);
 app.use('/campgrounds', campgroundRoutes);
 app.use('/campgrounds/:id/reviews', reviewRoutes);
 
+app.get('/', (req, res) => {
+   res.render('home');
+});
 
 // Uses Error Class //
 // covers all paths //
