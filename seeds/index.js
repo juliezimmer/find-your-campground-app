@@ -15,7 +15,7 @@ db.once("open", () => {
    console.log("Database connected");
 });
 
-// mix the descriptors and places: picking a random element from an array //
+//mix the descriptors and places: picking a random element from an array //
 const sample = array => array[Math.floor(Math.random() * array.length)];
 
 const seedDB = async () => {

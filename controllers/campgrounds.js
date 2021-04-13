@@ -34,8 +34,9 @@ module.exports.showCampground = async (req, res) => {
 
 module.exports.renderEditForm = async (req, res) => {
    const { id } = req.params;
-   if(!campground.author.equals(req.user._id)) {
-      req.flash('error', "You don't have permission to edit");
+   const campground = await Campground.findById(id);
+   if(!campground) {
+      req.flash('error', "Cannot find that campground");
       return res.redirect('/campgrounds');
    }
    res.render('campgrounds/edit', { campground });
@@ -44,7 +45,7 @@ module.exports.renderEditForm = async (req, res) => {
 module.exports.updateCampground = async(req, res) => {
    const { id } = req.params;
    const campground = await Campground.findByIdAndUpdate(id, { ...req.body.campground});
-   req.flash('success', 'You successfully updated this campground')
+   req.flash('success', 'You successfully updated this campground');
    res.redirect(`/campgrounds/${campground._id}`);
 }
 
