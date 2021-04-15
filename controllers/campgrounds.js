@@ -1,4 +1,5 @@
 const Campground = require('../models/campground');
+const { cloudinary } = require("../cloudinary");
 
 module.exports.index = async (req, res) => {
    const campgrounds = await Campground.find({});
@@ -11,8 +12,11 @@ module.exports.renderNewForm = (req, res) => {
 
 module.exports.createCampground = async(req, res, next) => {
    const campground = new Campground(req.body.campground);
+   // multer provides access to req.files //
+  campground.images = req.files.map(f => ({ url: f.path, filename: f.filename}));
    campground.author = req.user._id;
    await campground.save();
+   console.log(campground);
    req.flash('success', 'You successfully added a new campground');
    // redirects to detail page //
    res.redirect(`/campgrounds/${campground._id}`);

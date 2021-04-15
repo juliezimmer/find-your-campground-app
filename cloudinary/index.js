@@ -1,5 +1,6 @@
-const cloudinary = ('cloudinary').v2;
+const cloudinary = require ('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
+
 
 cloudinary.config({
    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -10,11 +11,13 @@ cloudinary.config({
 // Instantiate an instance of cloudinary storage
 const storage = new CloudinaryStorage ({
    cloudinary,
-   folder:'CampFinder',
-   allowedFormats: ['jpeg', 'png', 'jpg']
+   params: {
+      folder:'CampFinder',
+      allowedFormats: ['jpeg', 'png', 'jpg']
+   }
 });
 
 module.exports = {
-   cloudinary,
-   storage
-};
+   cloudinary, // the configured cloudinary instance
+   storage // setup with the cloudinary credentials
+}
