@@ -24,7 +24,7 @@ router.route('/:id')
 //route to get to show/details page for a specific campground//
    .get(catchAsync(campgrounds.showCampground))
    // route to serve edit form //
-   .put(isLoggedIn, isAuthor, validateCampground, catchAsync(campgrounds.updateCampground))
+   .put(isLoggedIn, isAuthor, upload.array('image'), validateCampground, catchAsync(campgrounds.updateCampground))
    // route to delete a campground //
    .delete(isLoggedIn, isAuthor, catchAsync(campgrounds.deleteCampground));
 
