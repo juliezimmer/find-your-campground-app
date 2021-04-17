@@ -21,7 +21,7 @@ router.route('/') // both routes use '/' path //
 router.get('/new', isLoggedIn, campgrounds.renderNewForm);
 
 router.route('/:id')
-//route to get to show/details page for a specific campground//
+// route to get to show/details page for a specific campground
    .get(catchAsync(campgrounds.showCampground))
    // route to serve edit form //
    .put(isLoggedIn, isAuthor, upload.array('image'), validateCampground, catchAsync(campgrounds.updateCampground))
