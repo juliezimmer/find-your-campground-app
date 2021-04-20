@@ -22,7 +22,7 @@ const seedDB = async () => {
    // clears the DB //
    await Campground.deleteMany({});
    // seed Logic //
-   for (let i = 0; i < 50; i++){
+   for (let i = 0; i < 300; i++){
       const random1000 = Math.floor(Math.random() * 1000);
       const price = Math.floor(Math.random() * 20) + 10;
       const camp = new Campground({
@@ -35,7 +35,10 @@ const seedDB = async () => {
          price,
          geometry: { 
             type : "Point", 
-            coordinates: [-113.1331, 47.0202]
+            coordinates: [
+               cities[random1000].longitude,
+               cities[random1000].latitude
+            ]
          },
          images:[ 
          {
@@ -45,12 +48,8 @@ const seedDB = async () => {
          {
            url: 'https://res.cloudinary.com/dyybhhmce/image/upload/v1618515855/CampFinder/qkfuvpw3wygztyxhbzxg.jpg',
            filename: 'CampFinder/qkfuvpw3wygztyxhbzxg'
-         },
-         {
-           url: 'https://res.cloudinary.com/dyybhhmce/image/upload/v1618515855/CampFinder/duchy3mlncvuftebvpx9.jpg',
-           filename: 'CampFinder/duchy3mlncvuftebvpx9'
-         }
-       ]
+         }     
+        ]
       })
       await camp.save();
    }
