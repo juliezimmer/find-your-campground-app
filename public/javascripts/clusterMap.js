@@ -2,7 +2,7 @@ mapboxgl.accessToken = mapToken;
 // create the map
 const map = new mapboxgl.Map({
    container: 'map',
-   style: 'mapbox://styles/mapbox/dark-v10',
+   style: 'mapbox://styles/mapbox/light-v10',
    center: [-103.59179687498357, 40.66995747013945],
    zoom: 3
 });
@@ -36,20 +36,20 @@ map.addLayer({
       'circle-color': [
          'step',
          ['get', 'point_count'],
-         '#51bbd6',
-         100,
-         '#f1f075',
-         750,
-         '#f28cb1'
+         '#00BCD4',
+         10,
+         '#2196F3',
+         30,
+         '#3F51B5'
       ],
       'circle-radius': [
       'step',
       ['get', 'point_count'],
+      15,
+      10,
       20,
-      100,
       30,
-      750,
-      40
+      25
       ]
    }
 });
@@ -60,9 +60,9 @@ map.addLayer({
    source: 'campgrounds',
    filter: ['has', 'point_count'],
    layout: {
-   'text-field': '{point_count_abbreviated}',
-   'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
-   'text-size': 12
+      'text-field': '{point_count_abbreviated}',
+      'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+      'text-size': 12
    }
 });
  
@@ -103,16 +103,9 @@ zoom: zoom
 // the location of the feature, with
 // description HTML from its properties.
 map.on('click', 'unclustered-point', function (e) {
-   console.log("Unclustererd point clicked!");
-   var coordinates = e.features[0].geometry.coordinates.slice();
-   var mag = e.features[0].properties.mag;
-   var tsunami;
- 
-   if (e.features[0].properties.tsunami === 1) {
-   tsunami = 'yes';
-   } else {
-   tsunami = 'no';
-   }
+   const {popUpMarkup} = e.features[0].properties ;
+   const coordinates = e.features[0].geometry.coordinates.slice();
+   
  
    // Ensure that if the map is zoomed out such that
    // multiple copies of the feature are visible, the
@@ -121,19 +114,17 @@ map.on('click', 'unclustered-point', function (e) {
    coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
       }
  
-new mapboxgl.Popup()
-.setLngLat(coordinates)
-.setHTML(
-'magnitude: ' + mag + '<br>Was there a tsunami?: ' + tsunami
-)
-.addTo(map);
-});
+   new mapboxgl.Popup()
+   .setLngLat(coordinates)
+   .setHTML(popUpMarkup)
+   .addTo(map);
+   });
  
-map.on('mouseenter', 'clusters', function () {
-   console.log("Mousing over a cluster!");
-   map.getCanvas().style.cursor = 'pointer';
-});
-map.on('mouseleave', 'clusters', function () {
-   map.getCanvas().style.cursor = '';
-});
+   map.on('mouseenter', 'clusters', function () {
+      console.log("Mousing over a cluster!");
+      map.getCanvas().style.cursor = 'pointer';
+   });
+   map.on('mouseleave', 'clusters', function () {
+      map.getCanvas().style.cursor = '';
+   });
 });
