@@ -6,6 +6,9 @@ style: 'mapbox://styles/mapbox/light-v10', // style URL
 center: campground.geometry.coordinates, // starting position [lng, lat]
 zoom: 6 // starting zoom
 });
+
+// adds map controls
+map.addControl(new mapboxgl.NavigationControl());
  
 // adds map pin
 // call a new instance of mapboxgl with marker

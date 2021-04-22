@@ -1,11 +1,14 @@
 mapboxgl.accessToken = mapToken;
 // create the map
 const map = new mapboxgl.Map({
-   container: 'map',
+   container: 'cluster-map',
    style: 'mapbox://styles/mapbox/light-v10',
    center: [-103.59179687498357, 40.66995747013945],
    zoom: 3
 });
+
+// adds zoom in and out and rotate, compass
+map.addControl(new mapboxgl.NavigationControl());
  
 map.on('load', function () {
    console.log("Map loaded!")
